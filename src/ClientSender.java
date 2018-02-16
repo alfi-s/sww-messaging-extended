@@ -11,33 +11,49 @@ import java.io.PrintStream;
 public class ClientSender extends Thread {
 
 	private String nickname;
+	private BufferedReader user;
 	private PrintStream server;
+	private boolean running;
 
-	ClientSender(String nickname, PrintStream server) {
+	ClientSender(String nickname, PrintStream server, BufferedReader user) {
 		this.nickname = nickname;
 		this.server = server;
+		this.user = user;
+		running = true;
 	}
 
-	/**
-	 * Start ClientSender thread.
-	 */
+	@Override
 	public void run() {
-		// So that we can use the method readLine:
-		BufferedReader user = new BufferedReader(new InputStreamReader(System.in));
 
 		try {
 			// Then loop forever sending messages to recipients via the server:
-			while (true) {
-				String userInput = user.readLine();
+			while (running) {
+				String cmd = user.readLine();
 
-				if (userInput.equals("quit")) {
-					server.println(userInput);
+				switch (cmd.toLowerCase()) {
+				case Commands.LOGOUT:
+					server.println(cmd);
+					running = false;
+					break;
+
+				case Commands.SEND:
+					String recipient = user.readLine();
+					String text = user.readLine();
+					server.println(cmd);
+					server.println(recipient);
+					server.println(text);
+					break;
+
+				case Commands.PREV:
+				case Commands.NEXT:
+				case Commands.DELETE:
+					server.println(cmd);
+					break;
+
+				default:
+					Report.error("Invalid command entered!");
 					break;
 				}
-
-				String text = user.readLine();
-				server.println(userInput); // Matches CCCCC in ServerReceiver
-				server.println(text); // Matches DDDDD in ServerReceiver
 			}
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Communication broke in ClientSender" + e.getMessage());
@@ -46,11 +62,3 @@ public class ClientSender extends Thread {
 		Report.behaviour("Client sender thread ending"); // Matches GGGGG in Client.java
 	}
 }
-
-/*
- * 
- * What happens if recipient is null? Then, according to the Java documentation,
- * println will send the string "null" (not the same as null!). So maye we
- * should check for that case! Paticularly in extensions of this system.
- * 
- */

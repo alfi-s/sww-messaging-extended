@@ -32,29 +32,35 @@ public class ServerReceiver extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				String userInput = myClient.readLine(); // Matches CCCCC in ClientSender.java
+				String cmd = myClient.readLine();
+				
+				switch(cmd.toLowerCase()) {
+				case Commands.SEND:
+                    String recipient = myClient.readLine();
+                    String text = myClient.readLine();
 
-				if (userInput == null || userInput.equals("quit")) {
-					// Either end of stream reached, just give up, or user wants to quit
-					break;
+                    Message msg = new Message(myClientsName, text);
+                    BlockingQueue<Message> recipientsQueue
+                        = clientTable.getQueue(recipient);
+                    if (recipientsQueue != null) {
+                      recipientsQueue.offer(msg);
+                    } else
+                      Report.error("Message for non-existent client "
+                                   + recipient + ": " + text);
+                    break;
+
+                case Commands.PREV:
+                case Commands.NEXT:
+                case Commands.DELETE:
+                    //TODO prev, next, delete functions
+                    break;
+
+                default:
+                    Report.error("Received invalid command.");
+                    break;
+				
 				}
-
-				String text = myClient.readLine();      // Matches DDDDD in ClientSender.java
-
-				if (text != null) {
-					Message msg = new Message(myClientsName, text);
-					BlockingQueue<Message> recipientsQueue
-					= clientTable.getQueue(userInput); // Matches EEEEE in ServerSender.java
-					if (recipientsQueue != null) {
-						recipientsQueue.offer(msg);
-					} else {
-						Report.error("Message for unexistent client "
-								+ userInput + ": " + text);
-					}
-				} else {
-					// No point in closing socket. Just give up.
-					return;
-				}
+				
 			}
 		} catch (IOException e) {
 			Report.error("Something went wrong with the client " 

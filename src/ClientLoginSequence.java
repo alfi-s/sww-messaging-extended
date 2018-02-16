@@ -7,11 +7,13 @@ public class ClientLoginSequence extends Thread {
 	private BufferedReader fromServer;
 	private PrintStream toServer;
 	private BufferedReader userInput;
+	private boolean running;
 	
 	public ClientLoginSequence(BufferedReader s, PrintStream c, BufferedReader u) {
 		fromServer = s;
 		toServer = c;
 		userInput = u;
+		running = true;
 	}
 	
 	@Override
@@ -19,24 +21,28 @@ public class ClientLoginSequence extends Thread {
 		System.out.println("Welcome, please either login or register: \n");
 		
 		String username = null;
-		
+        boolean waitForCmd = true;
+        
 		try {
-            while(true) {
-            	
-                String cmd = userInput.readLine();
+            while(running) {
                 
-                if(cmd.equals(Commands.REGISTER) || cmd.equals(Commands.LOGIN)) {
-                    System.out.print("Please enter your username: ");
-                	username = userInput.readLine();
-                    toServer.println(cmd);
-                    toServer.println(username);
-                } 
-                else if (cmd.equals(Commands.QUIT)) {
-                	toServer.println(Commands.QUIT);
-                	break;
-                }
-                else {
-                    Report.error("Invalid command. Please either register or login");
+                while(waitForCmd) {
+                    String cmd = userInput.readLine();
+                	if(cmd.equalsIgnoreCase(Commands.REGISTER) || cmd.equalsIgnoreCase(Commands.LOGIN)) {
+                        System.out.print("Please enter your username: ");
+                    	username = userInput.readLine();
+                        toServer.println(cmd);
+                        toServer.println(username);
+                        waitForCmd = false;
+                    } 
+                    else if (cmd.equalsIgnoreCase(Commands.QUIT)) {
+                    	toServer.println(Commands.QUIT);
+                    	running = false;
+                    	waitForCmd = false;
+                    }
+                    else {
+                        Report.error("Invalid command. Please either register or login");
+                    }
                 }
                 
                 String reply = fromServer.readLine();
@@ -44,6 +50,7 @@ public class ClientLoginSequence extends Thread {
                 
                 if (reply.equals(Commands.CONNECTION_SUCCESS)) {
                     makeThreads(username);
+                    waitForCmd = true;
                 }
             }
         }
@@ -53,7 +60,7 @@ public class ClientLoginSequence extends Thread {
 	}
 
 	private void makeThreads(String username) {
-		ClientSender clientSender = new ClientSender(username, toServer);
+		ClientSender clientSender = new ClientSender(username, toServer, userInput);
 		ClientReceiver clientReceiver = new ClientReceiver(fromServer);
 		
 		clientSender.start();
