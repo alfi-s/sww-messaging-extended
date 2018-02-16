@@ -30,4 +30,9 @@ public class ClientTable {
 	public void remove(String nickname) {
 		queueTable.remove(nickname);
 	}
+	
+	// Searches the table:
+	public boolean has(String nickname) {
+		return queueTable.containsKey(nickname);
+	}
 }

@@ -6,6 +6,7 @@ public class Commands {
     public static final String PREV     = "previous";
     public static final String NEXT     = "next";
     public static final String DELETE   = "delete";
+    public static final String QUIT		= "quit";
 
     public static final String USER_ALREADY_EXISTS = "That username already exists";
     public static final String USER_NOT_FOUND      = "That username does not exist, please register";

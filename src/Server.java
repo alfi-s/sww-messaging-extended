@@ -33,27 +33,12 @@ public class Server {
 		try {
 			// We loop for ever, as servers usually do.
 			while (true) {
-				// Listen to the socket, accepting connections from new clients:
-				Socket socket = serverSocket.accept(); // Matches AAAAA in Client
+				Socket socket = serverSocket.accept();
+                BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintStream toClient = new PrintStream(socket.getOutputStream());
 
-				// This is so that we can use readLine():
-				BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-				// We ask the client what its name is:
-				String clientName = fromClient.readLine(); // Matches BBBBB in Client
-
-				Report.behaviour(clientName + " connected");
-
-				// We add the client to the table:
-				clientTable.add(clientName);
-
-				// We create and start a new thread to write to the client:
-				PrintStream toClient = new PrintStream(socket.getOutputStream());
-				ServerSender serverSender = new ServerSender(clientTable.getQueue(clientName), toClient);
-				serverSender.start();
-
-				// We create and start a new thread to read from the client:
-				(new ServerReceiver(clientName, fromClient, clientTable, serverSender)).start();
+                ServerLoginChecker loginChecker = new ServerLoginChecker(fromClient, toClient, clientTable);
+                loginChecker.start();
 			}
 		} catch (IOException e) {
 			// Lazy approach:
