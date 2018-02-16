@@ -47,7 +47,8 @@ public class ClientLoginSequence extends Thread {
                 
                 String reply = fromServer.readLine();
                 System.out.println(reply);
-                
+                if (reply.equals(Commands.USER_NOT_FOUND) || reply.equals(Commands.USER_ALREADY_EXISTS))
+                	waitForCmd = true;
                 if (reply.equals(Commands.CONNECTION_SUCCESS)) {
                     makeThreads(username);
                     waitForCmd = true;
