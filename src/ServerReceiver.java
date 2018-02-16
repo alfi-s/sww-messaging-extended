@@ -1,6 +1,7 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
 // Gets messages from client and puts them in a queue, for another
@@ -31,6 +32,12 @@ public class ServerReceiver extends Thread {
 	 */
 	public void run() {
 		try {
+			BlockingQueue<Message> clientsQueue = clientTable.getQueue(myClientsName);
+			ArrayList<Message> clientsLog = clientTable.getMessageLog(myClientsName);
+			
+			//Send the latest message if it exists when the user logs in
+			if (!clientsLog.isEmpty()) clientsQueue.offer(clientsLog.get(0));
+			
 			while (true) {
 				String cmd = myClient.readLine();
 				
@@ -42,13 +49,16 @@ public class ServerReceiver extends Thread {
                     Message msg = new Message(myClientsName, text);
                     BlockingQueue<Message> recipientsQueue
                         = clientTable.getQueue(recipient);
+                    ArrayList<Message> recipientsLog 
+                    	= clientTable.getMessageLog(recipient);
                     if (recipientsQueue != null) {
                       recipientsQueue.offer(msg);
+                      recipientsLog.add(msg);
                     } else
                       Report.error("Message for non-existent client "
                                    + recipient + ": " + text);
                     break;
-
+				
                 case Commands.PREV:
                 case Commands.NEXT:
                 case Commands.DELETE:
