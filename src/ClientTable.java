@@ -3,6 +3,7 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -11,14 +12,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ClientTable {
 
 	private ConcurrentMap<String, BlockingQueue<Message>> queueTable = new ConcurrentHashMap<>();
-	private ConcurrentMap<String, ArrayList<Message>> log = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, MessageLog<Message>> log = new ConcurrentHashMap<>();
 
 	public void add(String nickname) {
 		queueTable.put(nickname, new LinkedBlockingQueue<Message>());
-		log.put(nickname, new ArrayList<Message>());
+		log.put(nickname, new MessageLog<Message>());
 	}
 	
-	public ArrayList<Message> getMessageLog(String nickname) {
+	public MessageLog<Message> getMessageLog(String nickname) {
 		return log.get(nickname);
 	}
 

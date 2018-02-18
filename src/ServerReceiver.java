@@ -2,6 +2,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 
 // Gets messages from client and puts them in a queue, for another
@@ -35,10 +36,10 @@ public class ServerReceiver extends Thread {
 	public void run() {
 		try {
 			BlockingQueue<Message> clientsQueue = clientTable.getQueue(myClientsName);
-			ArrayList<Message> clientsLog = clientTable.getMessageLog(myClientsName);
+			MessageLog<Message> clientsLog = clientTable.getMessageLog(myClientsName);
 			
 			//Send the latest message if it exists when the user logs in
-			if (!clientsLog.isEmpty()) clientsQueue.offer(clientsLog.get(0));
+			if (!clientsLog.isEmpty()) clientsQueue.offer(clientsLog.getCurrent());
 			
 			while (running) {
 				String cmd = myClient.readLine();
@@ -55,7 +56,7 @@ public class ServerReceiver extends Thread {
                     Message msg = new Message(myClientsName, text);
                     BlockingQueue<Message> recipientsQueue
                         = clientTable.getQueue(recipient);
-                    ArrayList<Message> recipientsLog 
+                    MessageLog<Message> recipientsLog 
                     	= clientTable.getMessageLog(recipient);
                     if (recipientsQueue != null) {
                       recipientsQueue.offer(msg);
@@ -66,11 +67,15 @@ public class ServerReceiver extends Thread {
                     break;
 				
                 case Commands.PREV:
+                	clientsLog.getPrevious();
                 	break;
+                	
                 case Commands.NEXT:
+                	clientsLog.getNext();
                 	break;
+                	
                 case Commands.DELETE:
-                    //TODO prev, next, delete functions
+                    clientsLog.delete();
                     break;
 
                 default:
