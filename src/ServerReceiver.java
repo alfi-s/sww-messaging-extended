@@ -45,47 +45,23 @@ public class ServerReceiver extends Thread {
 				String cmd = myClient.readLine();
 				
 				switch(cmd.toLowerCase()) {
-				case Commands.LOGOUT:
-					running = false;
-					break;
+				case Commands.LOGOUT : running = false; break;
 					
-				case Commands.SEND:
-                    String recipient = myClient.readLine();
-                    String text = myClient.readLine();
-
-                    Message msg = new Message(myClientsName, text);
-                    BlockingQueue<Message> recipientsQueue
-                        = clientTable.getQueue(recipient);
-                    MessageLog<Message> recipientsLog 
-                    	= clientTable.getMessageLog(recipient);
-                    if (recipientsQueue != null) {
-                      recipientsQueue.offer(msg);
-                      recipientsLog.add(msg);
-                    } else
-                      Report.error("Message for non-existent client "
-                                   + recipient + ": " + text);
-                    break;
+				case Commands.SEND   : updateBlockingQueue(); break;
 				
-                case Commands.PREV:
-                	clientsQueue.offer(clientsLog.getPrevious());
-                	break;
+                case Commands.PREV   : clientsQueue.offer(clientsLog.getPrevious()); break;
                 	
-                case Commands.NEXT:
-                	clientsQueue.offer(clientsLog.getNext());
-                	break;
+                case Commands.NEXT   : clientsQueue.offer(clientsLog.getNext()); break;
                 	
-                case Commands.DELETE:
-                    clientsLog.delete();
-                    break;
+                case Commands.DELETE : clientsLog.delete(); break;
 
-                default:
-                    Report.error("Received invalid command.");
-                    break;
+                default				 : Report.error("Received invalid command."); break;
 				
 				}
 				
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			Report.error("Something went wrong with the client " 
 					+ myClientsName + " " + e.getMessage()); 
 			// No point in trying to close sockets. Just give up.
@@ -95,6 +71,24 @@ public class ServerReceiver extends Thread {
 		Report.behaviour("Server receiver ending");
 		companion.interrupt();
 		clientTable.remove(myClientsName);
+	}
+
+	private void updateBlockingQueue() throws IOException {
+		String recipient = myClient.readLine();
+		String text = myClient.readLine();
+
+		Message msg = new Message(myClientsName, text);
+		
+		BlockingQueue<Message> recipientsQueue
+		    = clientTable.getQueue(recipient);
+		MessageLog<Message> recipientsLog 
+			= clientTable.getMessageLog(recipient);
+		
+		if (recipientsQueue != null) {
+		  recipientsQueue.offer(msg);
+		  recipientsLog.add(msg);
+		} 
+		else Report.error("Message for non-existent client " + recipient + ": " + text);
 	}
 }
 
