@@ -58,7 +58,5 @@ public class ClientSender extends Thread {
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Communication broke in ClientSender" + e.getMessage());
 		}
-
-		Report.behaviour("Client sender thread ending"); // Matches GGGGG in Client.java
 	}
 }

@@ -23,14 +23,11 @@ public class ClientReceiver extends Thread {
 			while (true) {
 				String s = server.readLine(); // Matches FFFFF in ServerSender.java
 
-				if (s == null) {
-					throw new NullPointerException();
-				}
+				if (s == null) throw new NullPointerException();
+				if (s.equals(Commands.QUIT)) break;
 
 				System.out.println(s);
 			}
-		} catch (SocketException e) { // Matches HHHHH in Client.java
-			Report.behaviour("Client receiver ending");
 		} catch (NullPointerException | IOException e) {
 			Report.errorAndGiveUp("Server seems to have died " + (e.getMessage() == null ? "" : e.getMessage()));
 		}

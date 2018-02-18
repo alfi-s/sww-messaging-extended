@@ -29,6 +29,7 @@ public class ServerSender extends Thread {
 				client.println(msg); // Matches FFFFF in ClientReceiver
 			}
 		} catch (InterruptedException e) {
+			client.println(Commands.QUIT);
 			Report.behaviour("Server sender ending");
 		}
 	}

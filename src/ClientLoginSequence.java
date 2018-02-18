@@ -69,7 +69,9 @@ public class ClientLoginSequence extends Thread {
 		
 		try {
 			clientSender.join();
+			Report.behaviour("ClientSender Thread ended");
 			clientReceiver.join();
+			Report.behaviour("ClientReceiver Thread ended");
 		}
 		catch(InterruptedException e) {
 			Report.errorAndGiveUp("Fatal error: unexpected interruption occurred");

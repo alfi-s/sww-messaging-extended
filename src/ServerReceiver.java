@@ -12,6 +12,7 @@ public class ServerReceiver extends Thread {
 	private BufferedReader myClient;
 	private ClientTable clientTable;
 	private ServerSender companion;
+	private boolean running;
 
   /**
    * Constructs a new server receiver.
@@ -25,6 +26,7 @@ public class ServerReceiver extends Thread {
 		myClient = c;
 		clientTable = t;
 		companion = s;
+		running = true;
 	}
 
 	/**
@@ -38,10 +40,14 @@ public class ServerReceiver extends Thread {
 			//Send the latest message if it exists when the user logs in
 			if (!clientsLog.isEmpty()) clientsQueue.offer(clientsLog.get(0));
 			
-			while (true) {
+			while (running) {
 				String cmd = myClient.readLine();
 				
 				switch(cmd.toLowerCase()) {
+				case Commands.LOGOUT:
+					running = false;
+					break;
+					
 				case Commands.SEND:
                     String recipient = myClient.readLine();
                     String text = myClient.readLine();
@@ -60,7 +66,9 @@ public class ServerReceiver extends Thread {
                     break;
 				
                 case Commands.PREV:
+                	break;
                 case Commands.NEXT:
+                	break;
                 case Commands.DELETE:
                     //TODO prev, next, delete functions
                     break;

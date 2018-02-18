@@ -50,7 +50,7 @@ public class ServerLoginChecker extends Thread {
 			}
 		}
 		catch(IOException e) {
-			Report.errorAndGiveUp("I/O exception has occurred");
+			Report.error("I/O exception has occurred");
 		}
 	}
 
