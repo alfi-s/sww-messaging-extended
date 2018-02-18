@@ -24,7 +24,7 @@ public class ClientReceiver extends Thread {
 				String s = server.readLine(); // Matches FFFFF in ServerSender.java
 
 				if (s == null) throw new NullPointerException();
-				if (s.equals(Commands.QUIT)) break;
+				if (s.equals(Commands.LOGOUT)) break;
 
 				System.out.println(s);
 			}
