@@ -67,11 +67,11 @@ public class ServerReceiver extends Thread {
                     break;
 				
                 case Commands.PREV:
-                	clientsLog.getPrevious();
+                	clientsQueue.offer(clientsLog.getPrevious());
                 	break;
                 	
                 case Commands.NEXT:
-                	clientsLog.getNext();
+                	clientsQueue.offer(clientsLog.getNext());
                 	break;
                 	
                 case Commands.DELETE:
