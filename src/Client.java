@@ -40,12 +40,12 @@ class Client {
 		ClientLoginSequence loginSequence = new ClientLoginSequence(fromServer, toServer, userIn);
 		loginSequence.start();
 
-		// Wait for them to end and close sockets.
+		// Wait for it to end and close sockets.
 		try {
 			loginSequence.join();
-			toServer.close(); // Will trigger SocketException
-			fromServer.close(); // (matches HHHHH in ClientServer.java).
-			server.close(); // https://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#close()
+			toServer.close(); 
+			fromServer.close(); 
+			server.close(); 
 			Report.behaviour("Client receiver ended");
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Something wrong " + e.getMessage());

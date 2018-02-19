@@ -41,10 +41,7 @@ public class Server {
                 loginChecker.start();
 			}
 		} catch (IOException e) {
-			// Lazy approach:
 			Report.error("IO error " + e.getMessage());
-			// A more sophisticated approach could try to establish a new
-			// connection. But this is beyond the scope of this simple exercise.
 		}
 	}
 }

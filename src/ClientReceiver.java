@@ -1,7 +1,6 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.SocketException;
 
 // Gets messages from other clients via the server (by the
 // ServerSender thread).

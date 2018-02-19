@@ -1,6 +1,4 @@
 
-// Each nickname has a different incoming-message queue.
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

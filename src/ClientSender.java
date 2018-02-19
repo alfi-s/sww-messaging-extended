@@ -1,12 +1,8 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-// Repeatedly reads recipient's nickname and text from the user in two
-// separate lines, sending them to the server (read by ServerReceiver
-// thread).
 
 public class ClientSender extends Thread {
 

@@ -3,8 +3,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
-// Gets messages from client and puts them in a queue, for another
-// thread to forward to the appropriate client.
 
 public class ServerReceiver extends Thread {
 	private String myClientsName;
