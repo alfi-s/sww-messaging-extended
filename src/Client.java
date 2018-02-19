@@ -43,15 +43,15 @@ class Client {
 		// Wait for it to end and close sockets.
 		try {
 			loginSequence.join();
+			Report.behaviour("LoginSequence ending");
 			toServer.close(); 
 			fromServer.close(); 
 			server.close(); 
-			Report.behaviour("Client receiver ended");
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Something wrong " + e.getMessage());
 		} catch (InterruptedException e) {
 			Report.errorAndGiveUp("Unexpected interruption " + e.getMessage());
 		}
-		Report.behaviour("Client ended. Goodbye.");
+		Report.behaviour("Goodbye.");
 	}
 }

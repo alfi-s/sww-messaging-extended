@@ -24,7 +24,8 @@ public class ClientLoginSequence extends Thread {
         boolean waitForCmd = true;
         
 		try {
-            while(running) {
+			mainloop: 
+				while(running) {
                 
                 while(waitForCmd) {
                     String cmd = userInput.readLine();
@@ -37,8 +38,7 @@ public class ClientLoginSequence extends Thread {
                     } 
                     else if (cmd.equalsIgnoreCase(Commands.QUIT)) {
                     	toServer.println(Commands.QUIT);
-                    	running = false;
-                    	waitForCmd = false;
+                    	break mainloop;
                     }
                     else {
                         Report.error("Invalid command. Please either register or login");
