@@ -24,23 +24,9 @@ public class ServerLoginChecker extends Thread {
 				
 				switch(cmd) {
 				
-				case Commands.REGISTER:
-					String registerName = fromClient.readLine();
-					if (!clientTable.has(registerName)) {
-						clientTable.add(registerName);
-						toClient.println(Commands.CONNECTION_SUCCESS);
-						makeThreads(registerName);
-					} else toClient.println(Commands.USER_ALREADY_EXISTS);
-                    break;
+				case Commands.REGISTER: registerClient(); break;
 				
-				case Commands.LOGIN:
-					String loginName = fromClient.readLine();
-					if (clientTable.has(loginName)) {
-						Report.behaviour(loginName + " has connected");
-						toClient.println(Commands.CONNECTION_SUCCESS);
-						makeThreads(loginName);
-					} else toClient.println(Commands.USER_NOT_FOUND);
-					break;
+				case Commands.LOGIN: loginClient(); break;
 				
 				case Commands.QUIT:
 					Report.behaviour("LoginChecker Closing");
@@ -52,6 +38,25 @@ public class ServerLoginChecker extends Thread {
 		catch(IOException e) {
 			Report.error("I/O exception has occurred");
 		}
+	}
+
+	private void loginClient() throws IOException {
+		String loginName = fromClient.readLine();
+		if (clientTable.has(loginName)) {
+			Report.behaviour(loginName + " has connected");
+			toClient.println(Commands.CONNECTION_SUCCESS);
+			clientTable.setQueue(loginName, true);
+			makeThreads(loginName);
+		} else toClient.println(Commands.USER_NOT_FOUND);
+	}
+
+	private void registerClient() throws IOException {
+		String registerName = fromClient.readLine();
+		if (!clientTable.has(registerName)) {
+			clientTable.add(registerName);
+			toClient.println(Commands.CONNECTION_SUCCESS);
+			makeThreads(registerName);
+		} else toClient.println(Commands.USER_ALREADY_EXISTS);
 	}
 
 	private void makeThreads(String registerName) {

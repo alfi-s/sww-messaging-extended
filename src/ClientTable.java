@@ -1,41 +1,38 @@
 
 // Each nickname has a different incoming-message queue.
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientTable {
 
-	private ConcurrentMap<String, BlockingQueue<Message>> queueTable = new ConcurrentHashMap<>();
-	private ConcurrentMap<String, MessageLog<Message>> log = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, Account> userAccounts = new ConcurrentHashMap<>();
 
 	public void add(String nickname) {
-		queueTable.put(nickname, new LinkedBlockingQueue<Message>());
-		log.put(nickname, new MessageLog<Message>());
+		userAccounts.put(nickname, new Account(nickname));
 	}
 	
 	public MessageLog<Message> getMessageLog(String nickname) {
-		return log.get(nickname);
+		return userAccounts.get(nickname).getLog();
 	}
 
 	// Returns null if the nickname is not in the table:
 	public BlockingQueue<Message> getQueue(String nickname) {
-		return queueTable.get(nickname);
+		return userAccounts.get(nickname).getQueue();
+	}
+	
+	public void setQueue(String nickname, boolean isLoggedIn) {
+		userAccounts.get(nickname).setQueue(isLoggedIn);
 	}
 
 	// Removes from table:
 	public void remove(String nickname) {
-		queueTable.remove(nickname);
-		log.remove(nickname);
+		userAccounts.remove(nickname);
 	}
 	
 	// Searches the table:
 	public boolean has(String nickname) {
-		return queueTable.containsKey(nickname) && log.containsKey(nickname);
+		return userAccounts.containsKey(nickname);
 	}
 }

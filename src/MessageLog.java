@@ -26,12 +26,24 @@ public class MessageLog<E> {
 	}
 	
 	public E getNext() {
-		if (iterator.hasNext()) current = iterator.next();
+		E temp = null;
+		if (iterator.hasNext()) {
+			do {
+				temp = iterator.next();
+			} while(temp == current && iterator.hasNext());
+			current = temp;
+		}
 		return getCurrent();
 	}
 	
 	public E getPrevious() {
-		if (iterator.hasPrevious()) current = iterator.previous();
+		E temp = null;
+		if (iterator.hasPrevious()) {
+			do {
+				temp = iterator.previous();
+			} while(temp == current && iterator.hasPrevious());
+			current = temp;
+		}
 		return getCurrent();
 	}
 	

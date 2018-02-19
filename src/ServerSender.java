@@ -24,6 +24,7 @@ public class ServerSender extends Thread {
 	 */
 	public void run() {
 		try {
+			sleep(100);
 			while (true) {
 				Message msg = clientQueue.take(); // Matches EEEEE in ServerReceiver
 				client.println(msg); // Matches FFFFF in ClientReceiver

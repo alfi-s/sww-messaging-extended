@@ -1,8 +1,6 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
 
 // Gets messages from client and puts them in a queue, for another
@@ -45,7 +43,7 @@ public class ServerReceiver extends Thread {
 				String cmd = myClient.readLine();
 				
 				switch(cmd.toLowerCase()) {
-				case Commands.LOGOUT : running = false; break;
+				case Commands.LOGOUT : logoutClient(); break;
 					
 				case Commands.SEND   : updateBlockingQueue(); break;
 				
@@ -70,7 +68,11 @@ public class ServerReceiver extends Thread {
 
 		Report.behaviour("Server receiver ending");
 		companion.interrupt();
-		clientTable.remove(myClientsName);
+	}
+
+	private void logoutClient() {
+		clientTable.setQueue(myClientsName, false);
+		running = false;
 	}
 
 	private void updateBlockingQueue() throws IOException {
@@ -84,10 +86,13 @@ public class ServerReceiver extends Thread {
 		MessageLog<Message> recipientsLog 
 			= clientTable.getMessageLog(recipient);
 		
-		if (recipientsQueue != null) {
-		  recipientsQueue.offer(msg);
-		  recipientsLog.add(msg);
+		if (clientTable.has(recipient) && recipientsQueue != null) {
+			recipientsQueue.offer(msg);
+			recipientsLog.add(msg);
 		} 
+		else if (recipientsQueue == null) {
+			recipientsLog.add(msg);
+		}
 		else Report.error("Message for non-existent client " + recipient + ": " + text);
 	}
 }
