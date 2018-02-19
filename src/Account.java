@@ -1,15 +1,18 @@
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Account {
 
 	private String nickname;
-	private BlockingQueue<Message> queue;
+	private ConcurrentMap<String, BlockingQueue<Message>> queues;
 	private MessageLog<Message> log;
 	
 	public Account(String name) {
 		nickname = name;
-		queue = new LinkedBlockingQueue<Message>();
+		queues = new ConcurrentHashMap<String, BlockingQueue<Message>>();
 		log = new MessageLog<Message>();
 	}
 	
@@ -17,17 +20,24 @@ public class Account {
 		return nickname;
 	}
 	
-	public BlockingQueue<Message> getQueue() {
-		return queue;
+	public void addQueue(String id) {
+		queues.put(id, new LinkedBlockingQueue<Message>());
 	}
 	
-	public void setQueue(boolean isLoggedIn) {
-		if(isLoggedIn && queue == null) {
-			queue = new LinkedBlockingQueue<Message>();
+	public void removeQueue(String id) {
+		queues.remove(id);
+	}
+	
+	public BlockingQueue<Message> getQueue(String id) {
+		return queues.get(id);
+	}
+	
+	public ArrayList<BlockingQueue<Message>> getAllQueues() {
+		ArrayList<BlockingQueue<Message>> listOfQueues= new ArrayList<>();
+		for(String instanceID : queues.keySet()) {
+			listOfQueues.add(queues.get(instanceID));
 		}
-		else if (!isLoggedIn && queue != null) {
-			queue = null;
-		}
+		return listOfQueues;
 	}
 	
 	public MessageLog<Message> getLog() {

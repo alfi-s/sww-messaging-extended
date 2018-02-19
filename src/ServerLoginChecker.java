@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.UUID;
 
 public class ServerLoginChecker extends Thread {
 	
@@ -41,27 +42,36 @@ public class ServerLoginChecker extends Thread {
 	}
 
 	private void loginClient() throws IOException {
+		//creates an ID to identify the current login
+		String instanceID = UUID.randomUUID().toString();
 		String loginName = fromClient.readLine();
+		
 		if (clientTable.has(loginName)) {
 			Report.behaviour(loginName + " has connected");
 			toClient.println(Commands.CONNECTION_SUCCESS);
-			clientTable.setQueue(loginName, true);
-			makeThreads(loginName);
+			clientTable.addQueue(loginName, instanceID);
+			makeThreads(loginName, instanceID);
 		} else toClient.println(Commands.USER_NOT_FOUND);
 	}
 
 	private void registerClient() throws IOException {
+		//creates an ID to identify the current login
+		String instanceID = UUID.randomUUID().toString();
 		String registerName = fromClient.readLine();
+		
 		if (!clientTable.has(registerName)) {
+			Report.behaviour(registerName + "has registered and connected");
 			clientTable.add(registerName);
+			clientTable.addQueue(registerName, instanceID);
 			toClient.println(Commands.CONNECTION_SUCCESS);
-			makeThreads(registerName);
+			makeThreads(registerName, instanceID);
 		} else toClient.println(Commands.USER_ALREADY_EXISTS);
 	}
 
-	private void makeThreads(String registerName) {
-		ServerSender serverSender = new ServerSender(clientTable.getQueue(registerName), toClient);
-		ServerReceiver serverReceiver = new ServerReceiver(registerName, fromClient, clientTable, serverSender);
+	private void makeThreads(String registerName, String instanceID) {
+		
+		ServerSender serverSender = new ServerSender(clientTable.getQueue(registerName, instanceID), toClient);
+		ServerReceiver serverReceiver = new ServerReceiver(registerName, instanceID, fromClient, clientTable, serverSender);
 		
 		serverSender.start();
 		serverReceiver.start();

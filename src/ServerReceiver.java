@@ -1,11 +1,13 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
 
 public class ServerReceiver extends Thread {
 	private String myClientsName;
+	private String instanceID;
 	private BufferedReader myClient;
 	private ClientTable clientTable;
 	private ServerSender companion;
@@ -14,12 +16,14 @@ public class ServerReceiver extends Thread {
   /**
    * Constructs a new server receiver.
    * @param n the name of the client with which this server is communicating
+   * @param id the instance ID assigned when the thread was created
    * @param c the reader with which this receiver will read data
    * @param t the table of known clients and connections
    * @param s the corresponding sender for this receiver
    */
-	public ServerReceiver(String n, BufferedReader c, ClientTable t, ServerSender s) {
+	public ServerReceiver(String n, String id, BufferedReader c, ClientTable t, ServerSender s) {
 		myClientsName = n;
+		instanceID = id;
 		myClient = c;
 		clientTable = t;
 		companion = s;
@@ -31,7 +35,7 @@ public class ServerReceiver extends Thread {
 	 */
 	public void run() {
 		try {
-			BlockingQueue<Message> clientsQueue = clientTable.getQueue(myClientsName);
+			BlockingQueue<Message> clientsQueue = clientTable.getQueue(myClientsName, instanceID);
 			MessageLog<Message> clientsLog = clientTable.getMessageLog(myClientsName);
 			
 			//Send the latest message if it exists when the user logs in
@@ -69,7 +73,7 @@ public class ServerReceiver extends Thread {
 	}
 
 	private void logoutClient() {
-		clientTable.setQueue(myClientsName, false);
+		clientTable.removeQueue(myClientsName, instanceID);
 		running = false;
 	}
 
@@ -79,16 +83,18 @@ public class ServerReceiver extends Thread {
 
 		Message msg = new Message(myClientsName, text);
 		
-		BlockingQueue<Message> recipientsQueue
-		    = clientTable.getQueue(recipient);
+		ArrayList<BlockingQueue<Message>> recipientsQueues
+		    = clientTable.getAllQueues(recipient);
 		MessageLog<Message> recipientsLog 
 			= clientTable.getMessageLog(recipient);
 		
-		if (clientTable.has(recipient) && recipientsQueue != null) {
-			recipientsQueue.offer(msg);
+		if (clientTable.has(recipient)) {
+			for(BlockingQueue<Message> queue : recipientsQueues) {
+				queue.offer(msg);
+			}
 			recipientsLog.add(msg);
 		} 
-		else if (recipientsQueue == null) {
+		else if (recipientsQueues.isEmpty()) {
 			recipientsLog.add(msg);
 		}
 		else Report.error("Message for non-existent client " + recipient + ": " + text);
