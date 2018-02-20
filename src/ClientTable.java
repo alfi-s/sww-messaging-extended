@@ -8,8 +8,8 @@ public class ClientTable {
 
 	private ConcurrentMap<String, Account> userAccounts = new ConcurrentHashMap<>();
 
-	public void add(String nickname) {
-		userAccounts.put(nickname, new Account(nickname));
+	public void add(String nickname, Password password) {
+		userAccounts.put(nickname, new Account(nickname, password));
 	}
 	
 	public MessageLog<Message> getMessageLog(String nickname) {
@@ -43,5 +43,10 @@ public class ClientTable {
 	public ArrayList<BlockingQueue<Message>> getAllQueues(String nickname) {
 		return userAccounts.get(nickname).getAllQueues();
 	}
-
+	
+	public boolean testPassword(String nickname, String input) {
+		Password pw = userAccounts.get(nickname).getPassword();
+		String pInput = pw.getSHA256(input, pw.getSalt());
+		return pw.getHashedPassword().equals(pInput);
+	}
 }

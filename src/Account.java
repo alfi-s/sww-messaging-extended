@@ -9,10 +9,12 @@ public class Account {
 	private String nickname;
 	private ConcurrentMap<String, BlockingQueue<Message>> queues;
 	private MessageLog<Message> log;
+	private Password password;
 	
-	public Account(String name) {
+	public Account(String name, Password password) {
 		nickname = name;
 		queues = new ConcurrentHashMap<String, BlockingQueue<Message>>();
+		this.password = password;
 		log = new MessageLog<Message>();
 	}
 	
@@ -30,6 +32,10 @@ public class Account {
 	
 	public BlockingQueue<Message> getQueue(String id) {
 		return queues.get(id);
+	}
+	
+	public Password getPassword() {
+		return password;
 	}
 	
 	public ArrayList<BlockingQueue<Message>> getAllQueues() {

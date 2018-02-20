@@ -32,8 +32,10 @@ public class ClientLoginSequence extends Thread {
                 	if(cmd.equalsIgnoreCase(Commands.REGISTER) || cmd.equalsIgnoreCase(Commands.LOGIN)) {
                         System.out.print("Please enter your username: ");
                     	username = userInput.readLine();
+                    	String password = userInput.readLine();
                         toServer.println(cmd);
                         toServer.println(username);
+                        toServer.println(password);
                         waitForCmd = false;
                     } 
                     else if (cmd.equalsIgnoreCase(Commands.QUIT)) {
@@ -47,8 +49,11 @@ public class ClientLoginSequence extends Thread {
                 
                 String reply = fromServer.readLine();
                 System.out.println(reply);
-                if (reply.equals(Commands.USER_NOT_FOUND) || reply.equals(Commands.USER_ALREADY_EXISTS))
+                if (reply.equals(Commands.USER_NOT_FOUND) 
+                		|| reply.equals(Commands.USER_ALREADY_EXISTS) 
+                		|| reply.equals(Commands.INVALID_PASSWORD))
                 	waitForCmd = true;
+                
                 if (reply.equals(Commands.CONNECTION_SUCCESS)) {
                     makeThreads(username);
                     waitForCmd = true;
