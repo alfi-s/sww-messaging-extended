@@ -45,23 +45,26 @@ public class ServerLoginChecker extends Thread {
 		//creates an ID to identify the current login
 		String instanceID = UUID.randomUUID().toString();
 		String loginName = fromClient.readLine();
-		String password = fromClient.readLine();
 		
-		if (clientTable.has(loginName) && clientTable.testPassword(loginName, password)) {
-			Report.behaviour(loginName + " has connected");
+		if (clientTable.has(loginName)) {
+			String password = fromClient.readLine();
 			
-			//tells the client the connection was a success
-			toClient.println(Commands.CONNECTION_SUCCESS);
-			
-			//adds a running queue to the account
-			clientTable.addQueue(loginName, instanceID);
-			
-			//create threads
-			makeThreads(loginName, instanceID);
+			if (!clientTable.testPassword(loginName, password)) toClient.println(Commands.INVALID_PASSWORD);
+			else {
+				Report.behaviour(loginName + " has connected");
+				
+				//tells the client the connection was a success
+				toClient.println(Commands.CONNECTION_SUCCESS);
+				
+				//adds a running queue to the account
+				clientTable.addQueue(loginName, instanceID);
+				
+				//create threads
+				makeThreads(loginName, instanceID);
+			}
 		} 
 		
 		//send error messages if the login was unsuccessful
-		else if (!clientTable.testPassword(loginName, password)) toClient.println(Commands.INVALID_PASSWORD);
 		else toClient.println(Commands.USER_NOT_FOUND);
 	}
 

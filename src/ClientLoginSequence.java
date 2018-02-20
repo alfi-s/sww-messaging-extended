@@ -47,8 +47,6 @@ public class ClientLoginSequence extends Thread {
                         toServer.println(username);
                         toServer.println(password);
                         waitForCmd = false;
-                        
-                        System.out.println("");
                     } 
                 	
                     else if (cmd.equalsIgnoreCase(Commands.QUIT)) {
