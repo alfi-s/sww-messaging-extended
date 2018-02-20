@@ -25,7 +25,7 @@ public class ClientReceiver extends Thread {
 				if (s == null) throw new NullPointerException();
 				if (s.equals(Commands.LOGOUT)) break;
 
-				System.out.println(s);
+				System.out.println(s + "\n");
 			}
 		} catch (NullPointerException | IOException e) {
 			Report.errorAndGiveUp("Server seems to have died " + (e.getMessage() == null ? "" : e.getMessage()));
