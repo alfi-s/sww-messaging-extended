@@ -12,6 +12,8 @@ public class ServerReceiver extends Thread {
 	private ClientTable clientTable;
 	private ServerSender companion;
 	private boolean running;
+	private BlockingQueue<Message> clientsQueue;
+	private MessageLog<Message> clientsLog;
 
   /**
    * Constructs a new server receiver.
@@ -28,6 +30,8 @@ public class ServerReceiver extends Thread {
 		clientTable = t;
 		companion = s;
 		running = true;
+		clientsQueue = clientTable.getQueue(myClientsName, instanceID);
+		clientsLog = clientTable.getMessageLog(myClientsName);
 	}
 
 	/**
@@ -35,8 +39,6 @@ public class ServerReceiver extends Thread {
 	 */
 	public void run() {
 		try {
-			BlockingQueue<Message> clientsQueue = clientTable.getQueue(myClientsName, instanceID);
-			MessageLog<Message> clientsLog = clientTable.getMessageLog(myClientsName);
 			
 			//Send the latest message if it exists when the user logs in
 			if (!clientsLog.isEmpty()) clientsQueue.offer(clientsLog.getCurrent());
@@ -83,24 +85,26 @@ public class ServerReceiver extends Thread {
 		String text = myClient.readLine();
 
 		Message msg = new Message(myClientsName, text);
-
-		// get all the blocking queues that are running for each place the client is logged in
-		ArrayList<BlockingQueue<Message>> recipientsQueues
-		    = clientTable.getAllQueues(recipient);
-		MessageLog<Message> recipientsLog 
-			= clientTable.getMessageLog(recipient);
 		
 		if (clientTable.has(recipient)) {
-			//offer the message to each instance of a client login
-			for(BlockingQueue<Message> queue : recipientsQueues) {
-				queue.offer(msg);
+			
+			// get all the blocking queues that are running for each place the client is logged in
+			ArrayList<BlockingQueue<Message>> recipientsQueues
+			    = clientTable.getAllQueues(recipient);
+			MessageLog<Message> recipientsLog 
+				= clientTable.getMessageLog(recipient);
+			
+			if (recipientsQueues.isEmpty()) {
+				recipientsLog.add(msg);
+			} else {
+				//offer the message to each instance of a client login
+				for(BlockingQueue<Message> queue : recipientsQueues) {
+					queue.offer(msg);
+				}
+				recipientsLog.add(msg);	
 			}
-			recipientsLog.add(msg);
 		} 
-		else if (recipientsQueues.isEmpty()) {
-			recipientsLog.add(msg);
-		}
-		else Report.error("Message for non-existent client " + recipient + ": " + text);
+		else clientsQueue.offer(new Message("Server", "(Error) recipient " + recipient + " not found"));
 	}
 }
 
