@@ -26,8 +26,8 @@ public class ServerSender extends Thread {
 		try {
 			sleep(100);
 			while (true) {
-				Message msg = clientQueue.take(); // Matches EEEEE in ServerReceiver
-				client.println(msg); // Matches FFFFF in ClientReceiver
+				Message msg = clientQueue.take(); 
+				client.println(msg); 
 			}
 		} catch (InterruptedException e) {
 			client.println(Commands.LOGOUT);

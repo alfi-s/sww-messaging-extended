@@ -50,6 +50,8 @@ public class ClientSender extends Thread {
 					Report.error("Invalid command entered!");
 					break;
 				}
+				
+				System.out.println("");
 			}
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Communication broke in ClientSender" + e.getMessage());

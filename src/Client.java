@@ -25,7 +25,7 @@ class Client {
 		Socket server = null;
 
 		try {
-			server = new Socket(hostname, Port.number); // Matches AAAAA in Server.java
+			server = new Socket(hostname, Port.number);
 			toServer = new PrintStream(server.getOutputStream());
 			fromServer = new BufferedReader(new InputStreamReader(server.getInputStream()));
 			userIn = new BufferedReader(new InputStreamReader(System.in));
@@ -40,7 +40,7 @@ class Client {
 		ClientLoginSequence loginSequence = new ClientLoginSequence(fromServer, toServer, userIn);
 		loginSequence.start();
 
-		// Wait for it to end and close sockets.
+		// Wait for it to end and close sockets/streams.
 		try {
 			loginSequence.join();
 			Report.behaviour("LoginSequence ending");

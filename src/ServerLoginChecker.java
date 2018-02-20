@@ -49,10 +49,18 @@ public class ServerLoginChecker extends Thread {
 		
 		if (clientTable.has(loginName) && clientTable.testPassword(loginName, password)) {
 			Report.behaviour(loginName + " has connected");
+			
+			//tells the client the connection was a success
 			toClient.println(Commands.CONNECTION_SUCCESS);
+			
+			//adds a running queue to the account
 			clientTable.addQueue(loginName, instanceID);
+			
+			//create threads
 			makeThreads(loginName, instanceID);
 		} 
+		
+		//send error messages if the login was unsuccessful
 		else if (!clientTable.testPassword(loginName, password)) toClient.println(Commands.INVALID_PASSWORD);
 		else toClient.println(Commands.USER_NOT_FOUND);
 	}
@@ -65,21 +73,29 @@ public class ServerLoginChecker extends Thread {
 		
 		if (!clientTable.has(registerName)) {
 			Report.behaviour(registerName + "has registered and connected");
+			
+			//Adds the new user to the client table and adds a running queue
 			clientTable.add(registerName, new Password(passwordInput));
 			clientTable.addQueue(registerName, instanceID);
+			
+			//tell the client that the connection was a success
 			toClient.println(Commands.CONNECTION_SUCCESS);
+			
+			//create threads
 			makeThreads(registerName, instanceID);
 		} else toClient.println(Commands.USER_ALREADY_EXISTS);
 	}
 
 	private void makeThreads(String registerName, String instanceID) {
-		
+		//create threads appropriate for communicating with the client
 		ServerSender serverSender = new ServerSender(clientTable.getQueue(registerName, instanceID), toClient);
 		ServerReceiver serverReceiver = new ServerReceiver(registerName, instanceID, fromClient, clientTable, serverSender);
 		
+		//starts the threads
 		serverSender.start();
 		serverReceiver.start();
 		
+		//waits for the threads to end
 		try {
 			serverSender.join();
 			serverReceiver.join();

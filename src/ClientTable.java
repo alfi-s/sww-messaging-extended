@@ -5,13 +5,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class ClientTable {
-
+	
+	/**
+	 * A collection of all registered accounts
+	 */
 	private ConcurrentMap<String, Account> userAccounts = new ConcurrentHashMap<>();
 
+	/**
+	 * Registers an account to the client table
+	 * @param nickname the name of the user
+	 * @param password the encrypted password of the user
+	 */
 	public void add(String nickname, Password password) {
 		userAccounts.put(nickname, new Account(nickname, password));
 	}
-	
+
 	public MessageLog<Message> getMessageLog(String nickname) {
 		return userAccounts.get(nickname).getLog();
 	}
@@ -40,10 +48,21 @@ public class ClientTable {
 		userAccounts.get(nickname).removeQueue(id);
 	}
 	
+	/**
+	 * Gets all the queues such that messages are sent everywhere the user is logged-in
+	 * @param nickname name of the user
+	 * @return an ArrayList of all the user's blocking queues, one for each login
+	 */
 	public ArrayList<BlockingQueue<Message>> getAllQueues(String nickname) {
 		return userAccounts.get(nickname).getAllQueues();
 	}
 	
+	/**
+	 * Tests if a given string matches a certain user's password
+	 * @param nickname the name of the user
+	 * @param input the password that was passed in
+	 * @return true if the password is correct, false otherwise
+	 */
 	public boolean testPassword(String nickname, String input) {
 		Password pw = userAccounts.get(nickname).getPassword();
 		String pInput = pw.getSHA256(input, pw.getSalt());

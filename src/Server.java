@@ -21,7 +21,8 @@ public class Server {
 
 		// This table will be shared by the server threads:
 		ClientTable clientTable = new ClientTable();
-
+		
+		//creates a server socket
 		ServerSocket serverSocket = null;
 
 		try {
@@ -29,9 +30,11 @@ public class Server {
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Couldn't listen on port " + Port.number);
 		}
+		
+		Report.behaviour("Now waiting for connections...");
 
 		try {
-			// We loop for ever, as servers usually do.
+			// We loop forever, as servers usually do.
 			while (true) {
 				Socket socket = serverSocket.accept();
                 BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));

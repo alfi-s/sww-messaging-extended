@@ -4,6 +4,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * An Account object holds all the necessary information for a user
+ * when the register for the messaging service.
+ * @author alfis
+ *
+ */
 public class Account {
 
 	private String nickname;
@@ -38,6 +44,10 @@ public class Account {
 		return password;
 	}
 	
+	/**
+	 * Gets a list of all blocking queues, one for each instance of a login
+	 * @return ArrayList of client blocking queues
+	 */
 	public ArrayList<BlockingQueue<Message>> getAllQueues() {
 		ArrayList<BlockingQueue<Message>> listOfQueues= new ArrayList<>();
 		for(String instanceID : queues.keySet()) {

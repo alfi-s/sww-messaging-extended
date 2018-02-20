@@ -1,3 +1,8 @@
+/**
+ * A list of commands and strings that are used throughout the messaging system
+ * @author alfis
+ *
+ */
 public class Commands {
     public static final String REGISTER = "register";
     public static final String LOGIN    = "login";

@@ -65,10 +65,10 @@ public class ServerReceiver extends Thread {
 			Report.error("Something went wrong with the client " 
 					+ myClientsName + " " + e.getMessage()); 
 			// No point in trying to close sockets. Just give up.
-			// We end this thread (we don't do System.exit(1)).
 		}
 
 		Report.behaviour("Server receiver ending");
+		//interrupts the companion to signal that the client has logged out
 		companion.interrupt();
 	}
 
@@ -78,17 +78,20 @@ public class ServerReceiver extends Thread {
 	}
 
 	private void updateBlockingQueue() throws IOException {
+		//Reads the messages from the client
 		String recipient = myClient.readLine();
 		String text = myClient.readLine();
 
 		Message msg = new Message(myClientsName, text);
-		
+
+		// get all the blocking queues that are running for each place the client is logged in
 		ArrayList<BlockingQueue<Message>> recipientsQueues
 		    = clientTable.getAllQueues(recipient);
 		MessageLog<Message> recipientsLog 
 			= clientTable.getMessageLog(recipient);
 		
 		if (clientTable.has(recipient)) {
+			//offer the message to each instance of a client login
 			for(BlockingQueue<Message> queue : recipientsQueues) {
 				queue.offer(msg);
 			}

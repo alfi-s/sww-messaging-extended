@@ -32,6 +32,8 @@ public class Password {
 	public String getSHA256 (String password, byte[] salt) {
 		String hashed = "";
 		try {
+			//creates a MessageDigest object and create an array of bytes which encrypts
+			//the input with the SHA-256 encryption algorithm
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 			messageDigest.update(salt);
 			byte[] passwordDigest = messageDigest.digest(password.getBytes());
@@ -40,6 +42,7 @@ public class Password {
 			for(int i = 0; i < passwordDigest.length; i++) {
 				stringBuilder.append(Integer.toString((passwordDigest[i] & 0xff) + 0x100, 16).substring(1));;
 			}
+			//creates the hashed-password
 			hashed = stringBuilder.toString();
 		}
 		catch(NoSuchAlgorithmException e) {
@@ -50,6 +53,7 @@ public class Password {
 	}
 	
 	private byte[] createSalt() throws NoSuchAlgorithmException{
+		//generates a salt to secure the password
 		SecureRandom randomBytes = SecureRandom.getInstance("SHA1PRNG");
 		byte[] salt = new byte[16];
 		randomBytes.nextBytes(salt);
