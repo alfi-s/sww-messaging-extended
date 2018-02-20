@@ -1,10 +1,13 @@
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class ClientTable {
+public class ClientTable implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * A collection of all registered accounts
