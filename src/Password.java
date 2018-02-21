@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -6,8 +7,9 @@ import java.security.SecureRandom;
  * Based on the following tutorial on hashing passwords: 
  * https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
  */
-public class Password {
+public class Password implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private String hashedPassword;
 	private byte[] salt;
 	

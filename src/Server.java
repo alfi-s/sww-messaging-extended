@@ -19,10 +19,22 @@ public class Server {
 	 */
 	public static void main(String[] args) {
 
-		// This table will be shared by the server threads:
-		ClientTable clientTable = new ClientTable();
+		// Create a FileKeeper object to manage saving ClientTable data.
+		FileKeeper keeper = new FileKeeper();
 		
-		//creates a server socket
+		// This table will be shared by the server threads:
+		ClientTable clientTable = keeper.readData("table.ser");
+		
+		// This shutdown hook will save the client table data when the server exits
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				keeper.writeData(clientTable);
+				Report.behaviour("Server is shutting down");
+			}
+		});
+
+		// creates a server socket
 		ServerSocket serverSocket = null;
 
 		try {
@@ -30,18 +42,18 @@ public class Server {
 		} catch (IOException e) {
 			Report.errorAndGiveUp("Couldn't listen on port " + Port.number);
 		}
-		
+
 		Report.behaviour("Now waiting for connections...");
 
 		try {
 			// We loop forever, as servers usually do.
 			while (true) {
 				Socket socket = serverSocket.accept();
-                BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintStream toClient = new PrintStream(socket.getOutputStream());
+				BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				PrintStream toClient = new PrintStream(socket.getOutputStream());
 
-                ServerLoginChecker loginChecker = new ServerLoginChecker(fromClient, toClient, clientTable);
-                loginChecker.start();
+				ServerLoginChecker loginChecker = new ServerLoginChecker(fromClient, toClient, clientTable);
+				loginChecker.start();
 			}
 		} catch (IOException e) {
 			Report.error("IO error " + e.getMessage());

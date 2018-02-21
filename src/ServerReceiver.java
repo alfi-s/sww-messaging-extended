@@ -89,16 +89,15 @@ public class ServerReceiver extends Thread {
 			clientsQueue.offer(clientsLog.getNext());
 		} catch(NullPointerException e) {
 			//Actually redundant, already handled in the MessageLog class. Included for safety.
-			Report.error(myClientsName + " tried to access non-existent message (previous).");
+			Report.error(myClientsName + " tried to access non-existent message (next).");
 		}
-		
 	}
 
 	private void sendPrevious() {
 		try {
 			clientsQueue.offer(clientsLog.getPrevious());
 		} catch(NullPointerException e) {
-			Report.error(myClientsName + " tried to access non-existent message (next).");
+			Report.error(myClientsName + " tried to access non-existent message (previous).");
 		}
 	}
 

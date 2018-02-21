@@ -21,11 +21,11 @@ public class FileKeeper {
 			outputStream.close();
 		}
 		catch(IOException e) {
-			Report.error("Error: There was a problem trying to save account data");
+			Report.error("Error: There was a problem trying to save account data " + e.getMessage());
 		}
 	}
 	
-	public ClientTable readData(String filename) {
+	public ClientTable readData(String filename){
 		ClientTable clientTable = null;
 		FileInputStream fileStream = null;
 		ObjectInputStream inputStream = null;
@@ -35,12 +35,15 @@ public class FileKeeper {
 			inputStream = new ObjectInputStream(fileStream);
 			
 			clientTable = (ClientTable) inputStream.readObject();
+			
+			fileStream.close();
+			inputStream.close();
 		} 
 		catch(FileNotFoundException e) {
-			Report.error("table.ser has not yet been created");
+			return new ClientTable();
 		}
 		catch(IOException e) {
-			Report.error("There was a problem reading the file");
+			Report.error("I/O Exception " + e.getMessage());
 		}
 		catch(ClassNotFoundException e) {
 			Report.errorAndGiveUp("Class not found: " + e.getMessage());

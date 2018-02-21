@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,8 +11,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author alfis
  *
  */
-public class Account {
+public class Account implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private String nickname;
 	private ConcurrentMap<String, BlockingQueue<Message>> queues;
 	private MessageLog<Message> log;
