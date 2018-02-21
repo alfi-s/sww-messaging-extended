@@ -32,7 +32,7 @@ public class MessageLog<E> {
 		iterator.next();
 	}
 	
-	public E getCurrent() {
+	public E getCurrent() throws NullPointerException{
 		return current;
 	}
 	
@@ -41,7 +41,7 @@ public class MessageLog<E> {
 	 * element, if possible, and sets that as the current message
 	 * @return the next message
 	 */
-	public E getNext() {
+	public E getNext() throws NullPointerException{
 		E temp = null;
 		if (iterator.hasNext()) {
 			do {
@@ -58,7 +58,7 @@ public class MessageLog<E> {
 	 * element, if possible, and sets that as the current message
 	 * @return the previous message
 	 */
-	public E getPrevious() {
+	public E getPrevious() throws NullPointerException{
 		E temp = null;
 		if (iterator.hasPrevious()) {
 			do {
@@ -72,7 +72,7 @@ public class MessageLog<E> {
 	/**
 	 * Uses the iterator to delete the current message
 	 */
-	public void delete() {
+	public void delete() throws NullPointerException{
 		try {
 			iterator.remove();
 			if(iterator.hasNext()) current = iterator.next();
