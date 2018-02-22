@@ -6,7 +6,10 @@ import java.io.IOException;
 // ServerSender thread).
 
 public class ClientReceiver extends Thread {
-
+	
+	/**
+	 * Reads messages from the server.
+	 */
 	private BufferedReader server;
 
 	ClientReceiver(BufferedReader server) {
@@ -23,7 +26,7 @@ public class ClientReceiver extends Thread {
 				String s = server.readLine(); // Matches FFFFF in ServerSender.java
 
 				if (s == null) throw new NullPointerException();
-				if (s.equals(Commands.LOGOUT)) break;
+				if (s.equals(Commands.LOGOUT)) break; //closes the thread if user logs out
 
 				System.out.println(s + "\n");
 			}

@@ -17,16 +17,11 @@ public class ServerReceiver extends Thread {
 	/**
 	 * Constructs a new server receiver.
 	 * 
-	 * @param n
-	 *            the name of the client with which this server is communicating
-	 * @param id
-	 *            the instance ID assigned when the thread was created
-	 * @param c
-	 *            the reader with which this receiver will read data
-	 * @param t
-	 *            the table of known clients and connections
-	 * @param s
-	 *            the corresponding sender for this receiver
+	 * @param n the name of the client with which this server is communicating
+	 * @param id the instance ID assigned when the thread was created
+	 * @param c the reader with which this receiver will read data
+	 * @param t the table of known clients and connections
+	 * @param s the corresponding sender for this receiver
 	 */
 	public ServerReceiver(String n, String id, BufferedReader c, ClientTable t, ServerSender s) {
 		myClientsName = n;
@@ -49,6 +44,7 @@ public class ServerReceiver extends Thread {
 			if (!clientsLog.isEmpty())
 				clientsQueue.offer(clientsLog.getCurrent());
 
+			//reads a command and calls the appropriate method.
 			while (running) {
 				String cmd = myClient.readLine();
 
@@ -75,7 +71,10 @@ public class ServerReceiver extends Thread {
 		// interrupts the companion to signal that the client has logged out
 		companion.interrupt();
 	}
-
+	
+	/**
+	 * Delete a message from the client's log
+	 */
 	private void sendDelete() {
 		try {
 			clientsLog.delete();
@@ -84,6 +83,9 @@ public class ServerReceiver extends Thread {
 		}
 	}
 
+	/**
+	 * Gets the next message and passes it to the user
+	 */
 	private void sendNext() {
 		try {
 			clientsQueue.offer(clientsLog.getNext());
@@ -93,6 +95,9 @@ public class ServerReceiver extends Thread {
 		}
 	}
 
+	/**
+	 * Gets the previous message and passes it to the user
+	 */
 	private void sendPrevious() {
 		try {
 			clientsQueue.offer(clientsLog.getPrevious());
@@ -101,11 +106,18 @@ public class ServerReceiver extends Thread {
 		}
 	}
 
+	/**
+	 * Removes the BlockingQueue of a client's login instance
+	 */
 	private void logoutClient() {
 		clientTable.removeQueue(myClientsName, instanceID);
 		running = false;
 	}
 
+	/**
+	 * Updates the blocking queues and message logs with a sent message 
+	 * @throws IOException
+	 */
 	private void updateBlockingQueue() throws IOException {
 		// Reads the messages from the client
 		String recipient = myClient.readLine();
@@ -121,7 +133,7 @@ public class ServerReceiver extends Thread {
 			MessageLog<Message> recipientsLog = clientTable.getMessageLog(recipient);
 
 			if (recipientsQueues.isEmpty()) {
-				recipientsLog.add(msg);
+				recipientsLog.add(msg); //Recipient will still get message when they login later.
 			} else {
 				// offer the message to each instance of a client login
 				for (BlockingQueue<Message> queue : recipientsQueues) {

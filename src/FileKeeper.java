@@ -5,8 +5,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * A class which handles inputting and outputting clientTable data.
+ * @author alfis
+ *
+ */
 public class FileKeeper {
 	
+	/**
+	 * Writes the ClientTable data to the file data.ctable
+	 * @param clientTable The client table to save
+	 */
 	public void writeData(ClientTable clientTable) {
 		FileWriter fileStream = null;
 		PrintWriter printer = null;
@@ -25,6 +34,11 @@ public class FileKeeper {
 		}
 	}
 	
+	/**
+	 * Reads a file and loads the client table data.
+	 * @param filename The name of the file to read. 
+	 * @return A client table with the information stored in the file.
+	 */
 	public ClientTable readData(String filename){
 		ClientTable clientTable = null;
 		FileReader fileStream = null;

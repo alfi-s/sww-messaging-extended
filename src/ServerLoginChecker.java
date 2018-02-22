@@ -75,7 +75,7 @@ public class ServerLoginChecker extends Thread {
 		String passwordInput = fromClient.readLine();
 		
 		if (!clientTable.has(registerName)) {
-			Report.behaviour(registerName + "has registered and connected");
+			Report.behaviour(registerName + " has registered and connected");
 			
 			//Adds the new user to the client table and adds a running queue
 			clientTable.add(registerName, new Password(passwordInput, false));

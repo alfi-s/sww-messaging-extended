@@ -24,9 +24,12 @@ public class ClientSender extends Thread {
 		try {
 			// Then loop forever sending messages to recipients via the server:
 			while (running) {
+				//reads command from the user
 				String cmd = user.readLine();
-
+				
+				//matches the command
 				switch (cmd.toLowerCase()) {
+				
 				case Commands.LOGOUT:
 					server.println(cmd);
 					running = false;

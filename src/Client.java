@@ -24,6 +24,7 @@ class Client {
 		BufferedReader userIn = null;
 		Socket server = null;
 
+			//try to initialize the sockets
 		try {
 			server = new Socket(hostname, Port.number);
 			toServer = new PrintStream(server.getOutputStream());
@@ -34,7 +35,6 @@ class Client {
 		} catch (IOException e) {
 			Report.errorAndGiveUp("The server doesn't seem to be running " + e.getMessage());
 		}
-
 
 		// Create login managing sequence
 		ClientLoginSequence loginSequence = new ClientLoginSequence(fromServer, toServer, userIn);

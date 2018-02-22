@@ -21,10 +21,18 @@ public class MessageLog<E> {
 		current = null;
 	}
 	
+	/**
+	 * Gets the list of messages
+	 * @return ArrayList containing all the messages
+	 */
 	public ArrayList<E> getList() {
 		return list;
 	}
 	
+	/**
+	 * Sets the list
+	 * @param l The ArrayList to be set
+	 */
 	public void setList(ArrayList<E> l) {
 		list = l;
 		iterator = l.listIterator();
@@ -43,6 +51,11 @@ public class MessageLog<E> {
 		iterator.next();
 	}
 	
+	/**
+	 * Gets the current message
+	 * @return Message object of the current message
+	 * @throws NullPointerException if the current message doesn't exist yet 
+	 */
 	public E getCurrent() throws NullPointerException{
 		return current;
 	}

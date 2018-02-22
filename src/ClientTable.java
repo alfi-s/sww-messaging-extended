@@ -9,44 +9,68 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ClientTable {
 	
-	/**
-	 * A collection of all registered accounts
-	 */
 	private ConcurrentMap<String, Account> userAccounts = new ConcurrentHashMap<>();
 
 	/**
 	 * Registers an account to the client table
-	 * @param nickname the name of the user
+	 * @param nickname The name of the user
 	 * @param password the encrypted password of the user
 	 */
 	public void add(String nickname, Password password) {
 		userAccounts.put(nickname, new Account(nickname, password));
 	}
 
+	/**
+	 * Gets the message log of a specified user.
+	 * @param nickname The user to access.
+	 * @return The MessageLog object stored in the user's account.
+	 */
 	public MessageLog<Message> getMessageLog(String nickname) {
 		return userAccounts.get(nickname).getLog();
 	}
 
+	/**
+	 * Gets the blocking queue of a specific login.
+	 * @param nickname The name of the user to access. 
+	 * @param id The instance ID of the user's login.
+	 * @return The BlockingQueue of the specified login
+	 */
 	// Returns null if the nickname is not in the table:
 	public BlockingQueue<Message> getQueue(String nickname, String id) {
 		return userAccounts.get(nickname).getQueue(id);
 	}
 
-	// Removes from table:
+	/**
+	 * Removes an entry from the userAccounts HashTable
+	 * @param nickname The name of the user to remove.
+	 */
 	public void remove(String nickname) {
 		userAccounts.remove(nickname);
 	}
 	
-	// Searches the table:
+	/**
+	 * Searches the table if it has a specified user.
+	 * @param nickname The name of the user to search
+	 * @return True if the user account is in the HashTable, false otherwise.
+	 */
 	public boolean has(String nickname) {
 		return userAccounts.containsKey(nickname);
 	}
 	
-	
+	/**
+	 * Adds a BlockingQueue to a user. Represents another login.
+	 * @param nickname Name of the user to access.
+	 * @param id The instance ID of the user's login.
+	 */
 	public void addQueue(String nickname, String id) {
 		userAccounts.get(nickname).addQueue(id);
 	}
 	
+	/**
+	 * Removes a BlockingQueue from a user. Represents a logout.
+	 * @param nickname The name of the user to access.
+	 * @param id The instance ID of teh user's login.
+	 */
 	public void removeQueue(String nickname, String id) {
 		userAccounts.get(nickname).removeQueue(id);
 	}
@@ -72,6 +96,10 @@ public class ClientTable {
 		return pw.getHashedPassword().equals(pInput);
 	}
 	
+	/**
+	 * Creates a representation of what to save.
+	 * @return A String which is what is stored when saved.
+	 */
 	public String saveTable() {
 		StringBuilder table = new StringBuilder();
 		
@@ -83,23 +111,28 @@ public class ClientTable {
 		return table.toString();
 	}
 	
+	/**
+	 * Sets the information in the client table according to a given data.
+	 * @param data The data passed in.
+	 */
 	public void loadTable(String data) {
 		BufferedReader dataReader = new BufferedReader(new StringReader(data));
 		String accountLine;
 		try {
 			while((accountLine = dataReader.readLine()) != null) {
 				if (accountLine.equals("\\BEGIN ACCOUNT\\")) {
+					
 					String name = dataReader.readLine();
 					Password password = new Password (dataReader.readLine(), true);
 					
 					ArrayList<Message> logToMake = new ArrayList<>();
 					String message;
 					while(!(message = dataReader.readLine()).equals("\\END ACCOUNT\\")) {
-						String[] messageComponents = message.split(" ", 3);
+						String[] messageComponents = message.split(" ", 3); //splits the string of the message
 						String nameToMake = 
-								messageComponents[1].substring(0, messageComponents[1].length() - 1);
+								messageComponents[1].substring(0, messageComponents[1].length() - 1); //gets the name
 						String textToMake = 
-								messageComponents[2];
+								messageComponents[2]; //gets the message
 						logToMake.add(new Message(nameToMake, textToMake));
 					}
 					add(name, password);

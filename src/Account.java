@@ -12,25 +12,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  */
 public class Account {
-
-	/**
-	* The name of the account holder.
-	*/
+	
 	private String nickname;
-	
-	/**
-	* A list of BlockingQueues per login.
-	*/
 	private ConcurrentMap<String, BlockingQueue<Message>> queues;
-	
-	/**
-	* Stores the list of messages that the user has received.
-	*/
 	private MessageLog<Message> log;
-	
-	/**
-	* The password that has already been encrypted.
-	*/
 	private Password password;
 	
 	public Account(String name, Password password) {
@@ -102,8 +87,8 @@ public class Account {
 	
 	/**
 	* Creates a string of all the information held by the account. Used for
-	* saving the data to an accout. See SOLUTION.md for format.
-	* @return A String in a specified format holdin account information.
+	* saving the data to an account. See SOLUTION.md for format.
+	* @return A String in a specified format holding account information.
 	*/	
 	public String saveState() {
 		StringBuilder sb = new StringBuilder();

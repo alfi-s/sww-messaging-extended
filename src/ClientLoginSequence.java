@@ -7,7 +7,7 @@ import java.io.PrintStream;
  *
  */
 public class ClientLoginSequence extends Thread {
-	
+
 	private BufferedReader fromServer;
 	private PrintStream toServer;
 	private BufferedReader userInput;
@@ -20,6 +20,9 @@ public class ClientLoginSequence extends Thread {
 		running = true;
 	}
 	
+	/**
+	 * Runs the login sequence
+	 */
 	@Override
 	public void run() {
 		System.out.println("Welcome, please either login or register:");
@@ -36,19 +39,23 @@ public class ClientLoginSequence extends Thread {
                 	System.out.print("Please enter a command: ");
                     String cmd = userInput.readLine();
                     
+                    //for login or registering
                 	if(cmd.equalsIgnoreCase(Commands.REGISTER) || cmd.equalsIgnoreCase(Commands.LOGIN)) {
-                        
+                       
+                		//takes the name and password
                 		System.out.print("Please enter your username: ");
                     	username = userInput.readLine();
                     	System.out.print("Please enter your password: ");
                     	String password = userInput.readLine();
                     	
+                    	//sends that to the server
                         toServer.println(cmd);
                         toServer.println(username);
                         toServer.println(password);
                         waitForCmd = false;
                     } 
                 	
+                	//quits the server
                     else if (cmd.equalsIgnoreCase(Commands.QUIT)) {
                     	toServer.println(Commands.QUIT);
                     	break mainloop;
@@ -78,6 +85,10 @@ public class ClientLoginSequence extends Thread {
         }	
 	}
 
+	/**
+	 * Creates threads for the client to start using the messaging system.
+	 * @param username The name of the user that they had inputted
+	 */
 	private void makeThreads(String username) {
 		//Creates threads necessary for communication to the server and back
 		ClientSender clientSender = new ClientSender(username, toServer, userInput);
