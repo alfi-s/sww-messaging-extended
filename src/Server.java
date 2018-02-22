@@ -25,11 +25,16 @@ public class Server {
 		// This table will be shared by the server threads:
 		ClientTable clientTable = keeper.readData("data.ctable");
 		
+		// Creates a thread that saves data every 5 minutes
+		ServerSaver saver = new ServerSaver(keeper, clientTable, 5);
+		saver.start();
+		
 		// This shutdown hook will save the client table data when the server exits
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				keeper.writeData(clientTable);
+				saver.interrupt();
 				Report.behaviour("Server is shutting down");
 			}
 		});
