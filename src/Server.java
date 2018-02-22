@@ -23,7 +23,7 @@ public class Server {
 		FileKeeper keeper = new FileKeeper();
 		
 		// This table will be shared by the server threads:
-		ClientTable clientTable = keeper.readData("table.ser");
+		ClientTable clientTable = keeper.readData("data.ctable");
 		
 		// This shutdown hook will save the client table data when the server exits
 		Runtime.getRuntime().addShutdownHook(new Thread() {

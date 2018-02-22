@@ -1,8 +1,6 @@
-import java.io.Serializable;
 
-public class Message implements Serializable{
+public class Message{
 
-	private static final long serialVersionUID = 1L;
 	private final String sender;
 	private final String text;
 

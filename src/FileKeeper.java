@@ -1,24 +1,24 @@
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 
 public class FileKeeper {
 	
 	public void writeData(ClientTable clientTable) {
-		FileOutputStream fileStream = null;
-		ObjectOutputStream outputStream = null;
+		FileWriter fileStream = null;
+		PrintWriter printer = null;
 		
 		try {
-			fileStream = new FileOutputStream("table.ser");
-			outputStream = new ObjectOutputStream(fileStream);
+			fileStream = new FileWriter("data.ctable");
+			printer = new PrintWriter(fileStream);
 			
-			outputStream.writeObject(clientTable);
+			printer.print(clientTable.saveTable());
 			
 			fileStream.close();
-			outputStream.close();
+			printer.close();
 		}
 		catch(IOException e) {
 			Report.error("Error: There was a problem trying to save account data " + e.getMessage());
@@ -27,26 +27,31 @@ public class FileKeeper {
 	
 	public ClientTable readData(String filename){
 		ClientTable clientTable = null;
-		FileInputStream fileStream = null;
-		ObjectInputStream inputStream = null;
+		FileReader fileStream = null;
+		BufferedReader reader = null;
 		
 		try {
-			fileStream = new FileInputStream(filename);
-			inputStream = new ObjectInputStream(fileStream);
+			fileStream = new FileReader(filename);
+			reader = new BufferedReader(fileStream);
 			
-			clientTable = (ClientTable) inputStream.readObject();
+			StringBuilder data = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				data.append(line);
+				data.append("\r\n");
+			}
+			
+			clientTable = new ClientTable();
+			clientTable.loadTable(data.toString());
 			
 			fileStream.close();
-			inputStream.close();
+			reader.close();
 		} 
 		catch(FileNotFoundException e) {
 			return new ClientTable();
 		}
 		catch(IOException e) {
 			Report.error("I/O Exception " + e.getMessage());
-		}
-		catch(ClassNotFoundException e) {
-			Report.errorAndGiveUp("Class not found: " + e.getMessage());
 		}
 		
 		return clientTable;

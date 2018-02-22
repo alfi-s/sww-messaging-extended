@@ -1,4 +1,4 @@
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -9,9 +9,8 @@ import java.util.ListIterator;
  *
  * @param <E> the type of the message
  */
-public class MessageLog<E> implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
+public class MessageLog<E> {
+
 	private ArrayList<E> list;
 	private transient ListIterator<E> iterator;
 	private E current;
@@ -20,6 +19,16 @@ public class MessageLog<E> implements Serializable{
 		list = new ArrayList<E>();
 		iterator = list.listIterator();
 		current = null;
+	}
+	
+	public ArrayList<E> getList() {
+		return list;
+	}
+	
+	public void setList(ArrayList<E> l) {
+		list = l;
+		iterator = l.listIterator();
+		while(iterator.hasNext()) current = iterator.next();
 	}
 	
 	/**

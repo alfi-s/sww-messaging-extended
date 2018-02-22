@@ -78,7 +78,7 @@ public class ServerLoginChecker extends Thread {
 			Report.behaviour(registerName + "has registered and connected");
 			
 			//Adds the new user to the client table and adds a running queue
-			clientTable.add(registerName, new Password(passwordInput));
+			clientTable.add(registerName, new Password(passwordInput, false));
 			clientTable.addQueue(registerName, instanceID);
 			
 			//tell the client that the connection was a success

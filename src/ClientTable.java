@@ -1,13 +1,13 @@
 
-import java.io.Serializable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class ClientTable implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
+public class ClientTable {
 	
 	/**
 	 * A collection of all registered accounts
@@ -68,7 +68,49 @@ public class ClientTable implements Serializable {
 	 */
 	public boolean testPassword(String nickname, String input) {
 		Password pw = userAccounts.get(nickname).getPassword();
-		String pInput = pw.getSHA256(input, pw.getSalt());
+		String pInput = pw.getSHA256(input);
 		return pw.getHashedPassword().equals(pInput);
+	}
+	
+	public String saveTable() {
+		StringBuilder table = new StringBuilder();
+		
+		for(String name : userAccounts.keySet()) {
+			table.append(userAccounts.get(name).saveState());	
+			table.append("\r\n");
+		}
+		
+		return table.toString();
+	}
+	
+	public void loadTable(String data) {
+		BufferedReader dataReader = new BufferedReader(new StringReader(data));
+		String accountLine;
+		try {
+			while((accountLine = dataReader.readLine()) != null) {
+				if (accountLine.equals("\\BEGIN ACCOUNT\\")) {
+					String name = dataReader.readLine();
+					Password password = new Password (dataReader.readLine(), true);
+					
+					ArrayList<Message> logToMake = new ArrayList<>();
+					String message;
+					while(!(message = dataReader.readLine()).equals("\\END ACCOUNT\\")) {
+						String[] messageComponents = message.split(" ", 3);
+						String nameToMake = 
+								messageComponents[1].substring(0, messageComponents[1].length() - 1);
+						String textToMake = 
+								messageComponents[2];
+						logToMake.add(new Message(nameToMake, textToMake));
+					}
+					add(name, password);
+					getMessageLog(name).setList(logToMake);
+				}
+				
+					
+			}	
+		}
+		catch(IOException e) {
+			Report.error("Error: problem reading data: " + e.getMessage());
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,9 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author alfis
  *
  */
-public class Account implements Serializable{
+public class Account {
 
-	private static final long serialVersionUID = 1L;
 	private String nickname;
 	private ConcurrentMap<String, BlockingQueue<Message>> queues;
 	private MessageLog<Message> log;
@@ -62,4 +61,22 @@ public class Account implements Serializable{
 		return log;
 	}
 	
+	public String saveState() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("\\BEGIN ACCOUNT\\")
+		  .append("\r\n")
+		  .append(nickname)
+		  .append("\r\n")
+		  .append(password.getHashedPassword())
+		  .append("\r\n");
+		
+		for (Message message : log.getList()) {
+			sb.append(message);
+			sb.append("\r\n");
+		}
+		
+		sb.append("\\END ACCOUNT\\");
+		return sb.toString();
+	}
 }

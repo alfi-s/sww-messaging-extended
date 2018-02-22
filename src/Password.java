@@ -1,43 +1,34 @@
-import java.io.Serializable;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 /*
  * Based on the following tutorial on hashing passwords: 
  * https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
  */
-public class Password implements Serializable{
+public class Password{
 
-	private static final long serialVersionUID = 1L;
 	private String hashedPassword;
-	private byte[] salt;
 	
-	public Password(String passwordInput) { 
-		try {
-			salt = createSalt();
-		} catch (NoSuchAlgorithmException e) {
-			Report.error("Error: password hashing algorithm doesn't exist");
-			e.printStackTrace();
-		}
-		hashedPassword = getSHA256(passwordInput, salt);
+	public Password(String passwordInput, boolean exists) { 
+		if (exists) setHashedPassword(passwordInput); 
+		else hashedPassword = getSHA256(passwordInput);
 	}
 	
 	public String getHashedPassword() {
 		return hashedPassword;
 	}
 	
-	public byte[] getSalt() {
-		return salt;
+	private void setHashedPassword(String existingPassword) {
+		hashedPassword = existingPassword;
 	}
 	
-	public String getSHA256 (String password, byte[] salt) {
+	public String getSHA256 (String password) {
 		String hashed = "";
 		try {
 			//creates a MessageDigest object and create an array of bytes which encrypts
 			//the input with the SHA-256 encryption algorithm
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			messageDigest.update(salt);
 			byte[] passwordDigest = messageDigest.digest(password.getBytes());
 			StringBuilder stringBuilder = new StringBuilder();
 			
@@ -53,13 +44,4 @@ public class Password implements Serializable{
 		}
 		return hashed;
 	}
-	
-	private byte[] createSalt() throws NoSuchAlgorithmException{
-		//generates a salt to secure the password
-		SecureRandom randomBytes = SecureRandom.getInstance("SHA1PRNG");
-		byte[] salt = new byte[16];
-		randomBytes.nextBytes(salt);
-		return salt;
-	}
-	
 }
