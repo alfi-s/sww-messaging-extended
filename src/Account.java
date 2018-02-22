@@ -13,9 +13,24 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Account {
 
+	/**
+	* The name of the account holder.
+	*/
 	private String nickname;
+	
+	/**
+	* A list of BlockingQueues per login.
+	*/
 	private ConcurrentMap<String, BlockingQueue<Message>> queues;
+	
+	/**
+	* Stores the list of messages that the user has received.
+	*/
 	private MessageLog<Message> log;
+	
+	/**
+	* The password that has already been encrypted.
+	*/
 	private Password password;
 	
 	public Account(String name, Password password) {
@@ -25,29 +40,49 @@ public class Account {
 		log = new MessageLog<Message>();
 	}
 	
+	/**
+	* Gets the name of the account holder.
+	* @return A String representing the name of the account holder. 
+	*/
 	public String getName() {
 		return nickname;
 	}
 	
+	/**
+	* Adds a BlockingQueue to the list of queues. Represents another login.
+	* @param id The id of the login instance helping to identify the queue.
+	*/
 	public void addQueue(String id) {
 		queues.put(id, new LinkedBlockingQueue<Message>());
 	}
 	
+	/**
+	* Removes a BlockingQueue from the list of queues. Represents a logout.
+	*/
 	public void removeQueue(String id) {
 		queues.remove(id);
 	}
 	
+	/**
+	* Gets a specified BlockingQueue.
+	* @param id The id of the login instance helping to identify the queue.
+	* @return A BlockingQueue with the specified id.
+	*/
 	public BlockingQueue<Message> getQueue(String id) {
 		return queues.get(id);
 	}
 	
+	/**
+	* Gets the password of the account holder.
+	* @return The Password object belonging to the account holder.
+	*/
 	public Password getPassword() {
 		return password;
 	}
 	
 	/**
-	 * Gets a list of all blocking queues, one for each instance of a login
-	 * @return ArrayList of client blocking queues
+	 * Gets a list of all blocking queues, one for each instance of a login.
+	 * @return ArrayList of client blocking queues.
 	 */
 	public ArrayList<BlockingQueue<Message>> getAllQueues() {
 		ArrayList<BlockingQueue<Message>> listOfQueues= new ArrayList<>();
@@ -57,10 +92,19 @@ public class Account {
 		return listOfQueues;
 	}
 	
+	/**
+	* Gets the list of messages that the user has received.
+	* @return The MessageLog object belonging to the user.
+	*/
 	public MessageLog<Message> getLog() {
 		return log;
 	}
 	
+	/**
+	* Creates a string of all the information held by the account. Used for
+	* saving the data to an accout. See SOLUTION.md for format.
+	* @return A String in a specified format holdin account information.
+	*/	
 	public String saveState() {
 		StringBuilder sb = new StringBuilder();
 		
