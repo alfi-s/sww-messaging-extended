@@ -14,11 +14,11 @@ This works similarly to the Register function, as it is handled in the ClientLog
 ## 3. Logout
 The logout function is similar to the `quit` function implemented in the previous exercise, but because this is merely removing the ClientSender/ClientReceiver/ServerSender/ServerReceiver threads and going back to the ClientLoginSequence/ServerLoginChecker, it counts as a logout rather than a quit function. When a logged-in user types `logout`, the ClientSender tells the ServerReceiver, then breaks out of its own while-loop to terminate. The ServerReceiver removes the BlockingQueue of this login instance as it is no longer needed. Then it breaks its while-loop and calls `interrupt` on ServerSender. It can do this because it has a reference `companion` passed in its constructor. The ServerSender then catches an InterruptedException, where it sends the string "quit" to the ClientReceiver and then ends. When the client receiver gets this string, it breaks out of it's own while-loop. Now that all four threads are terminated, control is given back to the ClientLoginSequence/ServerLoginChecker threads, where the user could register/login again or `quit` to close terminate the client itself.
 
-### 3.1 Quit
+### 3.1 Quit (Client)
 The quit function is separate from the login function to allow the user to login or register as another user once they logout. This is implemented simply as the ClientLoginSequence tells the ServerLoginChecker that the user has typed "quit" and then the ClientLoginSequence terminates. The ServerLoginChecker also terminates upon receiving the message. Because the Client was waiting for the ClientLoginSequence to terminate, it now can close its streams and the socket and finally terminate.
 
 ## 4. Storing Messages
-The ClientTable now holds a HashMap of account objects. The account object holds user information upon registration, and one of the things it holds is a MessageLog object. A MessageLog object has an ArrayList of an arbitrary type (in the case that a future implementation changes the Message type), and also a ListIterator of that ArrayList. It also keeps track of the current message. The MessageLog provides methods for traversing the ArrayList whilst updating the current message (see section 6).
+The ClientTable now holds a HashMap of Account objects instead of Blocking Queues. The Account object holds user information upon registration, and one of the things it holds is a MessageLog object. A MessageLog object has an ArrayList of an arbitrary type (in the case that a future implementation changes the Message type), and also a ListIterator of that ArrayList. It also keeps track of the current message. The MessageLog provides methods for traversing the ArrayList whilst updating the current message (see section 6).
 
 The MessageLog of each user is updated independently of the Blocking Queues. This way, the MessageLog can keep track of all the messages so far, while the Blocking Queues exist to allow the ServerSender to send messages to the client regardless of simultaneous login.
 
@@ -30,13 +30,40 @@ In the ServerReceiver, it is first checked whether or not the recipient exists i
 ## 6. Stored-Message Traversal / Removal
 A user may see the messages that have been sent to them by typing `previous` or `next`. They may also delete any of these messages by typing `delete`.
 
-This is primarily handled within the MessageLog, which keeps track of the current message, and has a ListIterator that allows it to traverse the list. When a message is added, the iterator travels to the end of the list, adds the new message, and sets that as the current message.
+This is primarily handled within the MessageLog class, which keeps track of the current message, and has a ListIterator that allows it to traverse the list. When a message is added, the iterator travels to the end of the list, adds the new message, and sets that as the current message.
 
 When `previous` is called, the iterator calls its `previous()` method. This returns the element at the previous index and moves the iterator backwards. There may be the issue that the iterator could have been in front of the current message, and calling `previous()` would return the current message. To get around this, the iterator checks if the message is equal to the current message being tracked by the MessageLog object, and if so it calls `previous()` one more time, then sets it to the current message. `next` is implemented exactly the same, only using the iterator's `next()` command and checking forwards instead.
 
-When `delete` is called, the iterator deletes the current message, then sets the current message to be the next message (if it exists). If it doesn't exist, it sets the current message to the previous message, and if it doesn't exist, then current message is set to null. There is no concrete reason that the next message is prioritized over the previous message, this was chosen arbitrarily.
+When `delete` is called, the iterator deletes the current message, then sets the current message to be the next message (if it exists). If it doesn't exist, it sets the current message to the previous message, and if it doesn't exist, then current message is set to null. There is no concrete reason that the next message is prioriteized over the previous message, this was chosen arbitrarily.
 
 These methods may throw `NullPointerException` if the list is empty. These exceptions are caught in the ServerReceiver, where it then sends back an error message to the client.
 
 ## 7. Self-Chosen Feature(s)
-(explanation)
+I chose to implement a simple password encryption feature to validate users as they login, and also a procedure where the server could save data into a file which it could restore after the server has been terminated.
+
+### 7.1 Password Encryption System
+A new Password class was created to handle passwords and password encryption. It generally is a bad idea to store passwords in plain text, therefore the passwords are encrypted with the SHA-256 algorithm, which is an algorithm that can easily be done on a string, but difficult to reverse. The encryption was done simply by using the built-in `java.security.MessageDigest` class. The passwords are created, hashed, and then stored upon registration. When the user tries to login, the ServerLoginChecker hashes the password that the user inputted, and checks that against the hashed password stored in the user's account object. That way, there is no need to store the password in plain-text.
+
+### 7.2 Server Data Storage
+The server has the ability to save the ClientTable data to a file entitled `data.ctable` in the case that the server has been terminated. Initially, I inteded to save the data as objects using Serialization, but that would be an issue because in the case that I change any of the classes at a later date, the file couldn't be read. So instead, I decided to save a string which could be read and turned back into the ClientTable data.
+
+Each account has a method `saveState()` that can generate a string of its information using a StringBuilder. Each account will be represented as a string in the following format:
+```
+\BEGIN ACCOUNT\
+<NAME>
+<PASSWORD_HASH>
+From <recipient>: <text>
+From <recipient>: <text>
+From <recipient>: <text>
+        .
+        .
+        .
+From <recipient>: <text>
+\END ACCOUNT\
+```
+
+The client table also has a method `saveTable()` which can then call the `saveState()` method for each account, then append them to a string. This will be used to save the data. The client table also has a method `loadTable()` to read a string with the above format and create data based on the string. This will be used to load the data.
+
+The file I/O is handled by the FileKeeper class which has a method `writeData()` to save the clientTable data to a the `data.ctable` file, and also a method `readData()` to read the file and return a ClientTable. If the `readData()` method catches FileNotFoundException, then it will return an empty ClientTable.
+
+These methods are then called within the Server class itself. When the server starts, it will call `readData()` to set the ClientTable to be used. A Shutdown hook was also implemented inside the Server class to call `writeData()` when the Server is closed. The server also has a thread called ServerSaver which saves calls this method every 5 minutes, in case the Server crashes. 
